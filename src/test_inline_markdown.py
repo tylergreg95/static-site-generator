@@ -2,7 +2,9 @@ import unittest
 from inline_markdown import (
     split_nodes_delimiter,
     extract_markdown_links,
-    extract_markdown_images
+    extract_markdown_images,
+    split_nodes_links,
+    split_nodes_images,
 )
 
 from textnode import (
@@ -10,7 +12,9 @@ from textnode import (
     text_type_text,
     text_type_italic,
     text_type_bold,
-    text_type_code
+    text_type_code,
+    text_type_image,
+    text_type_link
 )
 
 class TestInlineMarkdown(unittest.TestCase):
@@ -67,3 +71,28 @@ class TestInlineMarkdown(unittest.TestCase):
         result = extract_markdown_links(text)
         expected = [("link", "https://www.example.com"), ("another", "https://www.example.com/another")]
         self.assertListEqual(result, expected)
+
+    def test_split_nodes_images(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png) and finally ![third image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsykjfd.png)"
+        result = split_nodes_images([TextNode(text, text_type_text)])
+        expected = [
+            TextNode("This is text with an ", text_type_text),
+            TextNode("image", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and another ", text_type_text),
+            TextNode("second image", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png"),
+            TextNode(" and finally ", text_type_text),
+            TextNode("third image", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsykjfd.png")   
+        ]
+        self.assertListEqual(result, expected)
+
+    def test_split_nodes_links(self):
+        text = "This text contains a link [link](https://www.google.com) and another [link](https://www.website.com)."
+        result = split_nodes_links([TextNode(text, text_type_text)])
+        expected = [
+            TextNode("This text contains a link ", text_type_text),
+            TextNode("link", text_type_link, "https://www.google.com"),
+            TextNode(" and another ", text_type_text),
+            TextNode("link", text_type_link, "https://www.website.com"),
+            TextNode(".", text_type_text)
+        ]
+        self.assertListEqual(result, expected)   
