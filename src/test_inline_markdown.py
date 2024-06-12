@@ -57,7 +57,6 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("bold", text_type_bold),
             TextNode(" word and ", text_type_text),
             TextNode("another", text_type_bold),
-            TextNode("", text_type_text),
         ]
         self.assertListEqual(new_nodes, expected)
     
@@ -114,3 +113,6 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("link", text_type_link, "https://boot.dev"),
         ]
         self.assertListEqual(nodes, expected)
+
+if __name__ == "__main__":
+    unittest.main()

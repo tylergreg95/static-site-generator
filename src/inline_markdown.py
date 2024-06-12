@@ -11,22 +11,22 @@ from textnode import (
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
-    for node in old_nodes:
-        if node.text_type != text_type_text:
-            new_nodes.append(node)
+    for old_node in old_nodes:
+        if old_node.text_type != text_type_text:
+            new_nodes.append(old_node)
             continue
-        delimiter_count = 0
-        for ch in node.text:
-            if ch == delimiter:
-                delimiter_count += 1
-        if delimiter_count % 2 != 0:
-            raise ValueError(f"Cannot find matching closing delimiter: {delimiter}")
-        split_node = node.text.split(delimiter)
-        for i in range(0, len(split_node)):
+        split_nodes = []
+        sections = old_node.text.split(delimiter)
+        if len(sections) % 2 == 0:
+            raise ValueError("Invalid markdown: formatted section not closed")
+        for i in range(len(sections)):
+            if sections[i] == "":
+                continue
             if i % 2 == 0:
-                new_nodes.append(TextNode(split_node[i], text_type_text))
+                split_nodes.append(TextNode(sections[i], text_type_text))
             else:
-                new_nodes.append(TextNode(split_node[i], text_type))
+                split_nodes.append(TextNode(sections[i], text_type))
+        new_nodes.extend(split_nodes)
     return new_nodes
 
 def extract_markdown_images(text):
@@ -91,10 +91,10 @@ def split_nodes_links(old_nodes):
     return new_nodes
 
 def text_to_textnodes(text):
-    origin_node = TextNode(text, text_type_text)
-    bold = split_nodes_delimiter([origin_node], "**", text_type_bold)
-    italic = split_nodes_delimiter(bold, "*", text_type_italic)
-    code = split_nodes_delimiter(italic, "`", text_type_code)
-    images = split_nodes_images(code)
-    links = split_nodes_links(images)
-    return links
+    nodes = [TextNode(text, text_type_text)]
+    nodes = split_nodes_delimiter(nodes, "**", text_type_bold)
+    nodes = split_nodes_delimiter(nodes, "*", text_type_italic)
+    nodes = split_nodes_delimiter(nodes, "`", text_type_code)
+    nodes = split_nodes_images(nodes)
+    nodes = split_nodes_links(nodes)
+    return nodes
