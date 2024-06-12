@@ -1,5 +1,7 @@
 import unittest
 
+from htmlnode import HTMLNode
+
 from block_markdown import (
     markdown_to_blocks,
     block_to_block_type,
@@ -39,6 +41,12 @@ This is the same paragraph on a new line
         blocks = markdown_to_blocks(markdown)
         self.assertListEqual(expected, blocks)
     
+    def test_block_to_block_type_paragraph(self):
+        markdown = """This is a paragraph
+and this is another part of the same"""
+        blocks = markdown_to_blocks(markdown)
+        self.assertEqual(block_to_block_type(blocks[0]), block_type_paragraph)
+
     def test_block_to_block_type_heading(self):
         markdown = "# This is a heading"
         blocks = markdown_to_blocks(markdown)
@@ -93,3 +101,6 @@ This is the same paragraph on a new line
         markdown = "1. This is an item in an unordered list\n3. And here is the second item\n2. And here is the last item"
         blocks = markdown_to_blocks(markdown)
         self.assertEqual(block_to_block_type(blocks[0]), block_type_paragraph)
+    
+if __name__ == "__main__":
+    unittest.main()
