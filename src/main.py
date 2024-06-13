@@ -1,20 +1,28 @@
-from textnode import TextNode
+import os
 import shutil
+
 from copystatic import copy_static_to_public_directory
+from gencontent import generate_page
+
+static_dir = "./static"
+public_dir = "./public"
+content_dir = "./content"
+template_path = "./template.html"
 
 def main():
-    static = "/home/tyler/workspace/github.com/tylergreg95/static-site-generator/static"
-    public = "/home/tyler/workspace/github.com/tylergreg95/static-site-generator/public"
+    print("Deleting public directory")
+    if os.path.exists(public_dir):
+        shutil.rmtree(public_dir)
 
-    try:
-        shutil.rmtree(public)
-        print(f"{public} successfully deleted")
-    except Exception:
-        print("public directory does not exist")
-
-    copy_static_to_public_directory(static, public)
-
-
+    print("Copying static files to public directory...")
+    copy_static_to_public_directory(static_dir, public_dir)
+    
+    print("Generating page...")
+    generate_page(
+        os.path.join(content_dir, "index.md"),
+        template_path,
+        os.path.join(public_dir, "index.html")
+    )
 
 
         
